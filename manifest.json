@@ -78,6 +78,28 @@
     },
     {
       "Icon": "Images/actionIcon",
+      "Name": "OSC: Control Channel Volume (Dial)",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Adjust volume",
+          "Push": "Toggle mute"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/actionDefaultImage"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "OSC: Control Channel Volume (Dial)",
+      "UUID": "de.shells.totalmix.oscchanneldial.action"
+    },
+    {
+      "Icon": "Images/actionIcon",
       "Name": "OSC: Control Channel",
       "States": [
         {
@@ -110,7 +132,7 @@
   "Version": "3.3.5",
   "SDKVersion": 2,
   "Software": {
-    "MinimumVersion": "4.3"
+    "MinimumVersion": "6.6"
   },
   "OS": [
     {
