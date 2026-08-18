@@ -58,6 +58,13 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
         SelectedDevice = actionInfo.payload.settings.SelectedDevice;
         Devices = actionInfo.payload.settings.Devices;
     }
+    else if (actionInfo.action === "de.shells.totalmix.oscchanneldial.action") {
+        Name = actionInfo.payload.settings.Name;
+        SelectedAction = actionInfo.payload.settings.SelectedAction;
+        Bus = actionInfo.payload.settings.Bus;
+        SelectedValue = actionInfo.payload.settings.SelectedValue;
+        ChannelCount = actionInfo.payload.settings.ChannelCount;
+    }
 }
 
 function websocketOnOpen() {
@@ -168,6 +175,15 @@ function setSettings(value, param) {
             ControlValue: ControlValue,
             SelectedDevice: SelectedDevice,
             Devices: Devices
+        }
+    }
+    else if (actionInfo.action === "de.shells.totalmix.oscchanneldial.action") {
+        settings = {
+            Name: Name,
+            SelectedAction: SelectedAction,
+            Bus: Bus,
+            SelectedValue: SelectedValue,
+            ChannelCount: ChannelCount
         }
     }
 
@@ -749,6 +765,72 @@ function updateUI(pl, settings) {
             document.getElementById("chk0").checked = false;
         }
     }
+    else if (pl === "de.shells.totalmix.oscchanneldial.action") {
+        let x = ['<div class="sdpi-item" id="select_single">',
+            '    <div class="sdpi-item-label">Select Channel</div>',
+            '    <select class="sdpi-item-value select" id="OscChannelDialSelect" onchange="selectedOscChannelDialChannel(event.target.value)">',
+            '    <optgroup label="Inputs" id="DialInputs">',
+            '    </optgroup>',
+            '    <optgroup label="Software" id="DialPlaybacks">',
+            '    </optgroup>',
+            '    <optgroup label="Outputs" id="DialOutputs">',
+            '    </optgroup></select>',
+            '</div>',
+            '<div class="sdpi-item">',
+            '    <div class="sdpi-item-label">Value</div>',
+            '    <input class="sdpi-item-value" id="dialSelectedValue" value="" placeholder="Enter step multiplier if applicable" onchange="setSettings(event.target.value, \'SelectedValue\')">',
+            '</div>',
+            '<div class="sdpi-item">',
+            '    <div class="sdpi-item-label">Help</div>',
+            '    <details class="sdpi-item-value">',
+            '        <summary>Rotate, Push and Value</summary>',
+            '        <p><font style="font-weight:bold">Rotate</font>: changes the volume of the selected channel.<br>0 is &#8734;, 82 is 0dB, 100 is +6dB<br><font style="font-style: italic">Available: All Channels</font></p>',
+            '        <p><font style="font-weight:bold">Push</font>: toggles mute on the selected channel.</p>',
+            '        <p><font style="font-weight:bold">Value</font>: (optional) Multiplier for the steps. Use full numbers! 2 will make twice as big steps, 5 will make 5 times as big steps, negative numbers will decrease the step size, so -2 will make half as big steps, etc.</p>',
+            '        <p>This action needs mirroring to be enabled - without it the touch display stays on <font style="font-style: italic">syncing...</font> and the dial does nothing.</p>',
+            '    </details>',
+            '</div>',
+            '<div class="sdpi-item">',
+            '    <div class="sdpi-item-label">Details</div>',
+            '    <details class="sdpi-item-value">',
+            '        <summary>More Info</summary>',
+            '        <p>Make sure TotalMix FX has OSC setup and it\'s in use.</p>',
+            '<p><span class="linkspan" onclick="openWebsite()">Link: more detailed instructions</span></p>',
+            '    </details>',
+            '</div>'].join('');
+        document.getElementById('placeholder').innerHTML = x;
+        // actionInfo は PI 起動時の 1 回きりのスナップショットで didReceiveSettings では更新されない。
+        // 選択肢を組み立てたこの値を保持しないと、畳み込み側が古い(または未設定の)チャンネル数を読む。
+        ChannelCount = settings.ChannelCount;
+        for (var i = 1; i < settings.ChannelCount + 1; i++) {
+            var elem = document.createElement("option");
+            elem.value = i;
+            elem.innerText = "Input Channel " + i;
+            document.getElementById("DialInputs").appendChild(elem);
+        }
+        for (var i = 1; i < settings.ChannelCount + 1; i++) {
+            var elem = document.createElement("option");
+            elem.value = i + settings.ChannelCount;
+            elem.innerText = "Playback Channel " + i;
+            document.getElementById("DialPlaybacks").appendChild(elem);
+        }
+        for (var i = 1; i < settings.ChannelCount + 1; i++) {
+            var elem = document.createElement("option");
+            elem.value = i + (settings.ChannelCount * 2);
+            elem.innerText = "Output Channel " + i;
+            document.getElementById("DialOutputs").appendChild(elem);
+        }
+        if (settings.SelectedAction === undefined) {
+            document.getElementById('OscChannelDialSelect').value = "1";
+        } else {
+            document.getElementById('OscChannelDialSelect').value = settings.SelectedAction;
+        }
+        if (settings.SelectedValue === undefined) {
+            document.getElementById('dialSelectedValue').value = "";
+        } else {
+            document.getElementById('dialSelectedValue').value = settings.SelectedValue;
+        }
+    }
 }
 
 
@@ -1172,6 +1254,35 @@ function selectedOscChannelFunction(selectedOscChannelFunction, oscChannelSelect
     setSettings(selectedOscChannelFunction, "SelectedFunction");
     setSettings(name, 'Name');
     setSettings(bus, 'Bus');
+}
+
+function selectedOscChannelDialChannel(oscChannelSelect) {
+    if (oscChannelSelect == undefined) {
+        oscChannelSelect = parseInt(actionInfo.payload.settings.SelectedAction);
+    }
+    const channelCount = ChannelCount;
+    let dialName;
+    let dialBus;
+    if (oscChannelSelect <= channelCount) {
+        dialName = "/1/volume" + oscChannelSelect;
+        dialBus = "Input";
+    } else if (oscChannelSelect > channelCount && oscChannelSelect <= channelCount * 2) {
+        dialName = "/1/volume" + (oscChannelSelect - channelCount);
+        dialBus = "Playback";
+    } else if (oscChannelSelect > channelCount * 2 && oscChannelSelect <= channelCount * 3) {
+        dialName = "/1/volume" + (oscChannelSelect - channelCount * 2);
+        dialBus = "Output";
+    }
+
+    // 畳み込みが外れたまま保存すると Name / Bus が undefined で永続化され、JSON からキーごと落ちる。
+    // 次回起動で TryGetBank が通らず syncing... から戻れなくなるので、何も書かずに戻る。
+    if (dialName === undefined) {
+        return;
+    }
+
+    setSettings(oscChannelSelect, 'SelectedAction');
+    setSettings(dialName, 'Name');
+    setSettings(dialBus, 'Bus');
 }
 
 function setFaderGainSetting(selectedsetting) {
