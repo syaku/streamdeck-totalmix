@@ -4,7 +4,7 @@ namespace streamdeck_totalmix
 {
     using BarRaider.SdTools;
     using System;
-    using Rug.Osc;
+    using Rug.Osc.Core;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
@@ -105,16 +105,16 @@ namespace streamdeck_totalmix
                                         // add every received bundle to the Global Dict
                                         for (var i = 0; i < bundle.Count; i++)
                                         {
-                                            Match heartbeat = Regex.Match(((Rug.Osc.OscMessage)bundle[i]).Address.ToString(), @"^\/$");
+                                            Match heartbeat = Regex.Match(((OscMessage)bundle[i]).Address.ToString(), @"^\/$");
                                             if (heartbeat.Success == true)
                                             {
                                                 return Task.CompletedTask;
                                             }
-                                            Match uninterestingValues = Regex.Match(((Rug.Osc.OscMessage)bundle[i]).Address.ToString(), "^.{3}(?>label|select)");
+                                            Match uninterestingValues = Regex.Match(((OscMessage)bundle[i]).Address.ToString(), "^.{3}(?>label|select)");
                                             if (uninterestingValues.Success == false)
                                             {
-                                                Globals.bankSettings[$"{bus}"][$"{((Rug.Osc.OscMessage)bundle[i]).Address}"] = ((Rug.Osc.OscMessage)bundle[i])[0].ToString();
-                                                if (((Rug.Osc.OscMessage)bundle[i]).Address == $"/1/micgain{Globals.channelCount}Val")
+                                                Globals.bankSettings[$"{bus}"][$"{((OscMessage)bundle[i]).Address}"] = ((OscMessage)bundle[i])[0].ToString();
+                                                if (((OscMessage)bundle[i]).Address == $"/1/micgain{Globals.channelCount}Val")
                                                 {
                                                     return Task.CompletedTask;
                                                 }

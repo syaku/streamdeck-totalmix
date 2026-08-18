@@ -2,13 +2,13 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Drawing;
+using SkiaSharp;
 using BarRaider.SdTools.Wrappers;
 
 namespace streamdeck_totalmix
 {
     [PluginActionId("de.shells.totalmix.osconoff.action")]
-    public class OscOnOff : PluginBase
+    public class OscOnOff : KeypadBase
     {
         private class PluginSettings
         {
@@ -209,7 +209,7 @@ namespace streamdeck_totalmix
                                             {
                                                 DrawImage(trackname, "Images/muteOn.png");
                                             }
-                                            Connection.StreamDeckConnection.SetStateAsync(1, Connection.ContextId);
+                                            Connection.SetStateAsync(1);
                                         }
                                         else
                                         {
@@ -225,7 +225,7 @@ namespace streamdeck_totalmix
                                             {
                                                 DrawImage(trackname, "Images/muteOff.png");
                                             }
-                                            Connection.StreamDeckConnection.SetStateAsync(0, Connection.ContextId);
+                                            Connection.SetStateAsync(0);
                                         }
                                     }
                                     else
@@ -272,17 +272,16 @@ namespace streamdeck_totalmix
 
         private async void DrawImage(String trackname, String imagePath, Int32 size = 12)
         {
-            TitleParameters tp = new TitleParameters(new FontFamily("Arial"), System.Drawing.FontStyle.Bold, size, Color.White, false, TitleVerticalAlignment.Bottom);
-            using (System.Drawing.Image image = Tools.GenerateGenericKeyImage(out Graphics graphics))
+            TitleParameters tp = KeyImage.TitleParametersOf(size);
+            using (SKBitmap image = SkiaTools.GenerateGenericKeyImage(out SKCanvas canvas))
             {
-                System.Drawing.Image actionImage = System.Drawing.Image.FromFile(@imagePath);
-                graphics.DrawImage(actionImage, 0, 0, image.Width, image.Height);
+                KeyImage.DrawBackground(canvas, imagePath, image.Width, image.Height);
                 if (settings.DisplayChannelName)
                 {
-                    graphics.AddTextPath(tp, image.Width, image.Height, trackname);
+                    canvas.AddTextPath(tp, image.Height, image.Width, trackname);
                 }
                 await Connection.SetImageAsync(image);
-                graphics.Dispose();
+                canvas.Dispose();
             }
         }
 
