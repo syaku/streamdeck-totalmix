@@ -100,7 +100,8 @@
   "CategoryIcon": "Images/category/categoryIcon",
   "Disabled": false,
   "Author": "Dominik Werland",
-  "CodePath": "de.shells.totalmix.exe",
+  "CodePath": "win/de.shells.totalmix.exe",
+  "CodePathMac": "mac/de.shells.totalmix",
   "PropertyInspectorPath": "PropertyInspector/PluginActionPI.html",
   "Description": "Control TotalMix FX with StreamDeck! Features: (rather complete) OSC and (limited) MIDI implementation. Load snapshots/mixes, toggle mute/solo globally and on individual channels, change channel volume, pan, gain, phase, cue, width, control master out and many other settings. Visit the project Github-site linked below to view a full manual!",
   "Name": "Control RME TotalMix FX",
@@ -112,6 +113,10 @@
     "MinimumVersion": "4.3"
   },
   "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "13"
+    },
     {
       "Platform": "windows",
       "MinimumVersion": "10"

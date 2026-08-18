@@ -3,12 +3,12 @@ using BarRaider.SdTools.Wrappers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Drawing;
+using SkiaSharp;
 
 namespace streamdeck_totalmix
 {
     [PluginActionId("de.shells.totalmix.oscchannel.action")]
-    public class OscChannel : PluginBase
+    public class OscChannel : KeypadBase
     {
         private class PluginSettings
         {
@@ -419,17 +419,16 @@ namespace streamdeck_totalmix
         }
         private void DrawImage(String trackname, String imagePath)
         {
-            TitleParameters tp = new TitleParameters(new FontFamily("Arial"), System.Drawing.FontStyle.Bold, 12, Color.White, false, TitleVerticalAlignment.Bottom);
-            using (Image image = Tools.GenerateGenericKeyImage(out Graphics graphics))
+            TitleParameters tp = KeyImage.TitleParametersOf(12);
+            using (SKBitmap image = SkiaTools.GenerateGenericKeyImage(out SKCanvas canvas))
             {
-                Image actionImage = Image.FromFile(@imagePath);
-                graphics.DrawImage(actionImage, 0, 0, image.Width, image.Height);
+                KeyImage.DrawBackground(canvas, imagePath, image.Width, image.Height);
                 if (settings.DisplayChannelName)
                 {
-                    graphics.AddTextPath(tp, image.Width, image.Height, trackname);
+                    canvas.AddTextPath(tp, image.Height, image.Width, trackname);
                 }
                 Connection.SetImageAsync(image);
-                graphics.Dispose();
+                canvas.Dispose();
             }
         }
 

@@ -10,10 +10,7 @@ namespace streamdeck_totalmix
     using System.Threading.Tasks;
     using System.Threading;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Text.RegularExpressions;
     using System.Diagnostics;
-    using System.Runtime.InteropServices;
 
     internal class HelperFunctions
     {
@@ -108,14 +105,22 @@ namespace streamdeck_totalmix
                     {
                         if (Globals.killAndRestartOnStuck)
                         {
-                            foreach (Process process in Process.GetProcessesByName("TotalMixFX"))
+                            foreach (Process process in Process.GetProcessesByName(Platform.ProcessName()))
                             {
                                 process.Kill();
                             }
                             Task.Run(() => Task.Delay(3000)).Wait();
                             var startProc = new Process();
-                            startProc.StartInfo.FileName = "TotalMixFX.exe";
+                            startProc.StartInfo = Platform.StartInfo();
                             startProc.Start();
+                            if (Platform.LauncherExitsImmediately())
+                            {
+                                startProc.WaitForExit(5000);
+                                if (startProc.HasExited && startProc.ExitCode != 0)
+                                {
+                                    Logger.Instance.LogMessage(TracingLevel.WARN, $"CheckForTotalMix: restart launcher exited {startProc.ExitCode}");
+                                }
+                            }
                             Task.Run(() => Task.Delay(2000)).Wait();
                             HelperFunctions _helper = new HelperFunctions();
                             _helper.ShowHideUi();
@@ -168,33 +173,11 @@ namespace streamdeck_totalmix
 
         public static List<String> GetTotalMixConfig(String setting)
         {
-            var totalMixDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\TotalMixFx";
-            List<string> current = null;
-            current = new List<string>();
-            if (Directory.Exists(totalMixDir))
+            if (setting != "SnapshotName")
             {
-                FileInfo[] totalMixConfig = Directory.GetFiles(totalMixDir, "last.*.xml").Select(x => new FileInfo(x)).ToArray();
-                var currentConfig = totalMixConfig.OrderByDescending(f => f.LastWriteTime).FirstOrDefault();
-                if (setting == "SnapshotName")
-                {
-                    foreach (var line in File.ReadAllLines(currentConfig.ToString()))
-                    {
-                        if (line.Contains("SnapshotName"))
-                        {
-                            Match snapshotNames = Regex.Match(line, "v\\=\\\"(.*\\b)");
-                            if (snapshotNames.Success == true)
-                            {
-                                current.Add(snapshotNames.Groups[1].Value);
-                            }
-                        }
-                        if (line.Contains("<Inputs>"))
-                        {
-                            return current;
-                        }
-                    }
-                }
+                return new List<String>();
             }
-            return current;
+            return Platform.ReadSnapshotNames(Platform.SettingsDirectory());
         }
 
         // needed that for something... hmm
@@ -204,50 +187,15 @@ namespace streamdeck_totalmix
             public String Value { get; set; }
         }
 
-        [DllImport("user32.dll")]
-        public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-        private const int SW_HIDE = 0;
-        private const int SW_RESTORE = 5;
-        private IntPtr hWnd;
-        private IntPtr hWndCache;
-        private int hWndId;
-
-        delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        static extern bool EnumThreadWindows(int dwThreadId, EnumThreadDelegate lpfn,
-            IntPtr lParam);
-
-        static IEnumerable<IntPtr> EnumerateProcessWindowHandles(int processId)
-        {
-            var handles = new List<IntPtr>();
-
-            foreach (ProcessThread thread in Process.GetProcessById(processId).Threads)
-                EnumThreadWindows(thread.Id,
-                    (hWnd, lParam) => { handles.Add(hWnd); return true; }, IntPtr.Zero);
-
-            return handles;
-        }
         public void ShowHideUi()
         {
-
-            Process[] p = Process.GetProcessesByName("TotalMixFX");
-            //  hWnd = (int)p[0].MainWindowHandle;
-            hWnd = p[0].MainWindowHandle;
-            IntPtr WindowHandle = EnumerateProcessWindowHandles(p[0].Id).First();
-            if (hWndCache == IntPtr.Zero)
+            if (OperatingSystem.IsWindows())
             {
-                //    hWndCache = hWnd;
-                hWndCache = WindowHandle;
-            }
-            hWndId = (int)p[0].Id;
-            if (hWnd == (IntPtr)0)
-            {
-                ShowWindowAsync(hWndCache, SW_RESTORE);
+                WindowsUi.ShowHideUi();
             }
             else
             {
-                ShowWindowAsync(hWnd, SW_HIDE);
+                MacUi.ShowHideUi();
             }
         }
     }

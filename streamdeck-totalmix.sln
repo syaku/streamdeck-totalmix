@@ -5,16 +5,42 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "streamdeck-totalmix", "streamdeck-totalmix.csproj", "{4635D874-69C0-4010-BE46-77EF92EB1553}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "streamdeck-totalmix.Tests", "streamdeck-totalmix.Tests\streamdeck-totalmix.Tests.csproj", "{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4635D874-69C0-4010-BE46-77EF92EB1553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4635D874-69C0-4010-BE46-77EF92EB1553}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4635D874-69C0-4010-BE46-77EF92EB1553}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4635D874-69C0-4010-BE46-77EF92EB1553}.Debug|x64.Build.0 = Debug|Any CPU
+		{4635D874-69C0-4010-BE46-77EF92EB1553}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4635D874-69C0-4010-BE46-77EF92EB1553}.Debug|x86.Build.0 = Debug|Any CPU
 		{4635D874-69C0-4010-BE46-77EF92EB1553}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4635D874-69C0-4010-BE46-77EF92EB1553}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4635D874-69C0-4010-BE46-77EF92EB1553}.Release|x64.ActiveCfg = Release|Any CPU
+		{4635D874-69C0-4010-BE46-77EF92EB1553}.Release|x64.Build.0 = Release|Any CPU
+		{4635D874-69C0-4010-BE46-77EF92EB1553}.Release|x86.ActiveCfg = Release|Any CPU
+		{4635D874-69C0-4010-BE46-77EF92EB1553}.Release|x86.Build.0 = Release|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Debug|x64.Build.0 = Debug|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Debug|x86.Build.0 = Debug|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Release|x64.ActiveCfg = Release|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Release|x64.Build.0 = Release|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Release|x86.ActiveCfg = Release|Any CPU
+		{58C8BE21-69DD-4B50-BB69-6714FEBFF3E3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

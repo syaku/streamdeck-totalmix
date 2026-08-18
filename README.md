@@ -15,7 +15,15 @@ The plugin however also supports MIDI wiht a limited feature set in case you don
 ## What Is It Not (and what can't it do?)
 
 It's not a MIDI controller or axis emulator. The Elgato StreamDeck offers simple digital buttons. They are pressed and then a predefined action will trigger. You can thus not do anything that requires analog axis.
-It also doesn't run on MacOS. Bummer, I know.
+
+## Windows and macOS
+
+The plugin runs on both Windows 10+ and macOS 13+ (Apple Silicon). It ships one `.sdPlugin` folder containing both builds, `win/` and `mac/`, and the manifest points the Stream Deck app at the right one.
+
+macOS notes:
+
+- Only Apple Silicon (arm64) is verified. Intel Macs are untested.
+- The "Show/hide UI" action uses `osascript` to toggle the TotalMix window. macOS will ask you to grant the Stream Deck app Automation permission for "System Events" the first time you use it. Without that permission the action does nothing.
 
 ## Release / Installation
 
@@ -48,9 +56,13 @@ No additional software is needed. In theory this should also be able to control 
 
 Note: if you're using a (software) firewall on your PC and/or any firewall between the StreamDeck and the target PC - make sure to allow the plugin to communicate with the TotalMix port as well as allow TotalMix to listen to it. 
 
-## de.shells.totalmix.exe.config
-`%appdata%\Elgato\StreamDeck\Plugins\de.shells.totalmix.sdPlugin`
-contains the file `de.shells.totalmix.exe.config` (which is created with default values during the first start of the plugin and read during every start)
+## de.shells.totalmix.dll.config
+The settings file used to be `de.shells.totalmix.exe.config` next to the plugin executable. On .NET the runtime reads `de.shells.totalmix.dll.config` instead, and it now lives in the per-OS subfolder of the plugin:
+
+- Windows: `%appdata%\Elgato\StreamDeck\Plugins\de.shells.totalmix.sdPlugin\win\de.shells.totalmix.dll.config`
+- macOS: `~/Library/Application Support/com.elgato.StreamDeck/Plugins/de.shells.totalmix.sdPlugin/mac/de.shells.totalmix.dll.config`
+
+The keys and their meaning are unchanged (the file is shipped with default values and read during every start).
 
 ```xml
   <appSettings>
